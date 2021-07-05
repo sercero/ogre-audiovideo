@@ -43,7 +43,8 @@
 #	ifdef POCO_THREAD
 #		include "Poco/Mutex.h"
 #	else 
-#		include <boost/thread/recursive_mutex.hpp>
+//#		include <boost/thread/recursive_mutex.hpp>
+#		include <mutex>
 #	endif
 #endif
 
@@ -213,7 +214,8 @@ namespace OgreOggSound
 #	if POCO_THREAD
 		static Poco::Mutex mMutex;
 #	else
-		static boost::recursive_mutex mMutex;
+		//static boost::recursive_mutex mMutex;
+		static std::recursive_mutex mMutex;
 #	endif
 #endif
 

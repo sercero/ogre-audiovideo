@@ -49,10 +49,14 @@
 #		include "Poco/Thread.h"
 #		include "Poco/Mutex.h"
 #	else 
-#		include <boost/thread/thread.hpp>
-#		include <boost/function/function0.hpp>
-#		include <boost/thread/recursive_mutex.hpp>
-#		include <boost/thread/xtime.hpp>
+//#		include <boost/thread/thread.hpp>
+//#		include <boost/function/function0.hpp>
+//#		include <boost/thread/recursive_mutex.hpp>
+//#		include <boost/thread/xtime.hpp>
+#		include <thread>
+#		include <functional>
+#		include <mutex>
+#		include <chrono>
 #	endif
 #endif
 
@@ -634,9 +638,12 @@ namespace OgreOggSound
 		static Poco::Mutex mSoundMutex;
 		static Poco::Mutex mResourceGroupNameMutex;
 #	else
-		static boost::recursive_mutex mMutex;
-		static boost::recursive_mutex mSoundMutex;
-		static boost::recursive_mutex mResourceGroupNameMutex;
+		//static boost::recursive_mutex mMutex;
+		//static boost::recursive_mutex mSoundMutex;
+		//static boost::recursive_mutex mResourceGroupNameMutex;
+		static std::recursive_mutex mMutex;
+		static std::recursive_mutex mSoundMutex;
+		static std::recursive_mutex mResourceGroupNameMutex;
 #	endif
 
 		/** Pushes a sound action request onto the queue
@@ -686,7 +693,8 @@ namespace OgreOggSound
 		friend class Updater;
 		static Updater* mUpdater;
 #else
-		static boost::thread* mUpdateThread;
+		//static boost::thread* mUpdateThread;
+		static std::thread* mUpdateThread;
 #endif
 		static bool mShuttingDown;
 
@@ -725,7 +733,8 @@ namespace OgreOggSound
 #ifdef POCO_THREAD
 					Poco::Mutex::ScopedLock l(OgreOggSoundManager::getSingletonPtr()->mMutex);
 #else
-					boost::recursive_mutex::scoped_lock lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
+					//boost::recursive_mutex::scoped_lock lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
+					std::lock_guard<std::recursive_mutex> lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
 #endif
 					OgreOggSoundManager::getSingletonPtr()->_updateBuffers();
 					OgreOggSoundManager::getSingletonPtr()->_processQueuedSounds();
@@ -733,7 +742,8 @@ namespace OgreOggSound
 #ifdef POCO_THREAD
 				Poco::Thread::sleep(10);
 #else
-				boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+				//boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 #endif
 			}
 		}

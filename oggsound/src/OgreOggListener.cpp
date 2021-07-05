@@ -40,7 +40,8 @@ namespace OgreOggSound
 #	ifdef POCO_THREAD
 	Poco::Mutex OgreOggSound::OgreOggListener::mMutex;
 #	else
-	boost::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
+	//boost::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
+	std::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
 #	endif
 #endif
 
@@ -51,7 +52,8 @@ namespace OgreOggSound
 #	ifdef POCO_THREAD
 		Poco::Mutex::ScopedLock l(mMutex);
 #	else
-		boost::recursive_mutex::scoped_lock lock(mMutex);
+		//boost::recursive_mutex::scoped_lock lock(mMutex);
+		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
 		mPosition.x = x;
@@ -66,7 +68,8 @@ namespace OgreOggSound
 #	ifdef POCO_THREAD
 		Poco::Mutex::ScopedLock l(mMutex);
 #	else
-		boost::recursive_mutex::scoped_lock lock(mMutex);
+		//boost::recursive_mutex::scoped_lock lock(mMutex);
+		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
 		mPosition = pos;
@@ -106,7 +109,8 @@ namespace OgreOggSound
 #	ifdef POCO_THREAD
 		Poco::Mutex::ScopedLock l(mMutex);
 #	else
-		boost::recursive_mutex::scoped_lock lock(mMutex);
+		//boost::recursive_mutex::scoped_lock lock(mMutex);
+		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
 		mOrientation[0] = x;
@@ -124,7 +128,8 @@ namespace OgreOggSound
 #	ifdef POCO_THREAD
 		Poco::Mutex::ScopedLock l(mMutex);
 #	else
-		boost::recursive_mutex::scoped_lock lock(mMutex);
+		//boost::recursive_mutex::scoped_lock lock(mMutex);
+		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
 		#if OGRE_VERSION_MAJOR == 2
