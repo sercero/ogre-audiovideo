@@ -401,10 +401,10 @@ namespace OgreOggSound
 		Ogre::LogManager::getSingleton().logMessage("*** --- Using POCO threads for streaming", Ogre::LML_NORMAL);
 #	else
 		//mUpdateThread = OGRE_NEW_T(boost::thread, Ogre::MEMCATEGORY_GENERAL)(boost::function0<void>(&OgreOggSoundManager::threadUpdate, this));
-		//mUpdateThread = OGRE_NEW_T(std::thread, Ogre::MEMCATEGORY_GENERAL)(std::function<void(&OgreOggSoundManager::threadUpdate, this)>);
-		//mUpdateThread = std::thread(OgreOggSoundManager::threadUpdate, this)
-		mUpdateThread = new std::thread(&OgreOggSoundManager::threadUpdate, this);
-		Ogre::LogManager::getSingleton().logMessage("*** --- Using BOOST threads for streaming", Ogre::LML_NORMAL);
+		mUpdateThread = OGRE_NEW_T(std::thread, MEMCATEGORY_GENERAL)(std::bind(&OgreOggSoundManager::threadUpdate), this);
+
+		//Ogre::LogManager::getSingleton().logMessage("*** --- Using BOOST threads for streaming", Ogre::LML_NORMAL);
+		Ogre::LogManager::getSingleton().logMessage("*** --- Using std::threads for streaming", Ogre::LML_NORMAL);
 #	endif	
 #endif
 
