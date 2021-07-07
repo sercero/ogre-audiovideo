@@ -33,27 +33,38 @@ SET (SOURCE_FILES
 )
   
 # Option.
-option(OGGSOUND_THREADED "Enable multi-threaded streamed sounds" OFF)
-option(USE_POCO "Use POCO Threads?" OFF)
+#option(OGGSOUND_THREADED "Enable multi-threaded streamed sounds" OFF)
+set(OGGSOUND_THREADED "3" CACHE STRING 
+	"Enable multi-threaded streamed sounds:
+	0 - No multithreading
+	1 - POCO multithreading [DEPRECATED]
+	2 - boost:thread multithreading [DEPRECATED]
+	3 - std::thread multithreading"
+)
+set_property(CACHE OGGSOUND_THREADED PROPERTY STRINGS 0 1 2 3)
+#option(USE_POCO "Use POCO Threads?" OFF)
 option(USE_EFX "Use EFX? Disable this if you are using OpenAl Soft" OFF)
 
 IF(OGGSOUND_THREADED)
-  IF(USE_POCO)
-        INCLUDE (CheckIncludeFileCXX)
+	#IF(USE_POCO)
+	IF(OGGSOUND_THREADED EQUAL 1)
+		INCLUDE (CheckIncludeFileCXX)
 		CHECK_INCLUDE_FILE_CXX(Poco/ScopedLock.h HAVE_POCO_H)
 		IF(HAVE_POCO_H)
 			ADD_DEFINITIONS(-DOGGSOUND_THREADED=1)
 			ADD_DEFINITIONS(-DPOCO_THREAD=1)
 		ENDIF()
-	ELSE()
+	ELSEIF(OGGSOUND_THREADED EQUAL 2)
 		SET(Boost_ADDITIONAL_VERSIONS "1.47" "1.44" "1.43" "1.42")
 		FIND_PACKAGE(Boost 1.42.0 COMPONENTS thread)
 		IF (Boost_FOUND)
 			INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 			LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 			LINK_LIBRARIES(${Boost_LIBRARIES})
-			ADD_DEFINITIONS(-DOGGSOUND_THREADED=1)
+			ADD_DEFINITIONS(-DOGGSOUND_THREADED=2)
 		ENDIF()
+	ELSEIF(OGGSOUND_THREADED EQUAL 3)
+		ADD_DEFINITIONS(-DOGGSOUND_THREADED=2)
 	ENDIF()	 
 ELSE()
     ADD_DEFINITIONS(-DOGGSOUND_THREADED=0)
