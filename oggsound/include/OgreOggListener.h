@@ -40,10 +40,11 @@
 #include <OgreMovableObject.h>
 
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 #		include "Poco/Mutex.h"
-#	else 
-//#		include <boost/thread/recursive_mutex.hpp>
+#	elif OGGSOUND_THREADED == 2
+#		include <boost/thread/recursive_mutex.hpp>
+#	elif OGGSOUND_THREADED == 3
 #		include <mutex>
 #	endif
 #endif
@@ -211,10 +212,11 @@ namespace OgreOggSound
 	private:
 
 #if OGGSOUND_THREADED
-#	if POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		static Poco::Mutex mMutex;
-#	else
-		//static boost::recursive_mutex mMutex;
+#	elif OGGSOUND_THREADED == 2
+		static boost::recursive_mutex mMutex;
+	#elif OGGSOUND_THREADED == 3
 		static std::recursive_mutex mMutex;
 #	endif
 #endif

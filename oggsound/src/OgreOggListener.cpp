@@ -37,10 +37,11 @@
 namespace OgreOggSound
 {
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 	Poco::Mutex OgreOggSound::OgreOggListener::mMutex;
-#	else
-	//boost::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
+#	elif OGGSOUND_THREADED == 2
+	boost::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
+#	elif OGGSOUND_THREADED == 3
 	std::recursive_mutex OgreOggSound::OgreOggListener::mMutex;
 #	endif
 #endif
@@ -49,13 +50,15 @@ namespace OgreOggSound
 	void OgreOggListener::setPosition(ALfloat x, ALfloat y, ALfloat z)
 	{
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		Poco::Mutex::ScopedLock l(mMutex);
-#	else
-		//boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 2
+		boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 3
 		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
+
 		mPosition.x = x;
 		mPosition.y = y;
 		mPosition.z = z;
@@ -65,10 +68,11 @@ namespace OgreOggSound
 	void OgreOggListener::setPosition(const Ogre::Vector3 &pos)
 	{
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		Poco::Mutex::ScopedLock l(mMutex);
-#	else
-		//boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 2
+		boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 3
 		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
@@ -106,10 +110,11 @@ namespace OgreOggSound
 	void OgreOggListener::setOrientation(ALfloat x,ALfloat y,ALfloat z,ALfloat upx,ALfloat upy,ALfloat upz)
 	{
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		Poco::Mutex::ScopedLock l(mMutex);
-#	else
-		//boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 2
+		boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 3
 		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif
@@ -125,10 +130,11 @@ namespace OgreOggSound
 	void OgreOggListener::setOrientation(const Ogre::Quaternion &q)
 	{
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		Poco::Mutex::ScopedLock l(mMutex);
-#	else
-		//boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 2
+		boost::recursive_mutex::scoped_lock lock(mMutex);
+#	elif OGGSOUND_THREADED == 3
 		std::lock_guard<std::recursive_mutex> lock(mMutex);
 #	endif
 #endif

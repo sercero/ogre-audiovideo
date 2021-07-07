@@ -44,15 +44,16 @@
 #include <string>
 
 #if OGGSOUND_THREADED
-#	ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 #		include "Poco/ScopedLock.h"
 #		include "Poco/Thread.h"
 #		include "Poco/Mutex.h"
-#	else 
-//#		include <boost/thread/thread.hpp>
-//#		include <boost/function/function0.hpp>
-//#		include <boost/thread/recursive_mutex.hpp>
-//#		include <boost/thread/xtime.hpp>
+#	elif OGGSOUND_THREADED == 2
+#		include <boost/thread/thread.hpp>
+#		include <boost/function/function0.hpp>
+#		include <boost/thread/recursive_mutex.hpp>
+#		include <boost/thread/xtime.hpp>
+#	elif OGGSOUND_THREADED == 3
 #		include <thread>
 #		include <functional>
 #		include <mutex>
@@ -633,19 +634,22 @@ namespace OgreOggSound
 #endif
 
 #if OGGSOUND_THREADED
-#	if POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		static Poco::Mutex mMutex;
 		static Poco::Mutex mSoundMutex;
 		static Poco::Mutex mResourceGroupNameMutex;
-#	else
-		//static boost::recursive_mutex mMutex;
-		//static boost::recursive_mutex mSoundMutex;
-		//static boost::recursive_mutex mResourceGroupNameMutex;
+#	elif OGGSOUND_THREADED == 2
+		static boost::recursive_mutex mMutex;
+		static boost::recursive_mutex mSoundMutex;
+		static boost::recursive_mutex mResourceGroupNameMutex;
+#	elif OGGSOUND_THREADED == 3
 		static std::recursive_mutex mMutex;
 		static std::recursive_mutex mSoundMutex;
 		static std::recursive_mutex mResourceGroupNameMutex;
 #	endif
+#endif
 
+#if OGGSOUND_THREADED
 		/** Pushes a sound action request onto the queue
 		@remarks
 			Internal function - SHOULD NOT BE CALLED BY USER CODE!
@@ -666,7 +670,6 @@ namespace OgreOggSound
 #endif
  
 	private:
-
 		LocklessQueue<OgreOggISound*>* mSoundsToDestroy;
 
 #if OGGSOUND_THREADED
@@ -683,7 +686,7 @@ namespace OgreOggSound
 
 		LocklessQueue<SoundAction>* mActionsList;
 
-#ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 		static Poco::Thread* mUpdateThread;
 		class Updater : public Poco::Runnable
 		{
@@ -692,10 +695,11 @@ namespace OgreOggSound
 		};
 		friend class Updater;
 		static Updater* mUpdater;
-#else
-		//static boost::thread* mUpdateThread;
+#	elif OGGSOUND_THREADED == 2
+		static boost::thread* mUpdateThread;
+#	elif OGGSOUND_THREADED == 3
 		static std::thread* mUpdateThread;
-#endif
+#	endif
 		static bool mShuttingDown;
 
 		/** Flag indicating that a mutex should be used whenever an action is requested.
@@ -730,21 +734,23 @@ namespace OgreOggSound
 			while(!mShuttingDown)
 			{	
 				{
-#ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 					Poco::Mutex::ScopedLock l(OgreOggSoundManager::getSingletonPtr()->mMutex);
-#else
-					//boost::recursive_mutex::scoped_lock lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
+#	elif OGGSOUND_THREADED == 2
+					boost::recursive_mutex::scoped_lock lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
+#	elif OGGSOUND_THREADED == 3
 					std::lock_guard<std::recursive_mutex> lock(OgreOggSoundManager::getSingletonPtr()->mMutex);
-#endif
+#	endif
 					OgreOggSoundManager::getSingletonPtr()->_updateBuffers();
 					OgreOggSoundManager::getSingletonPtr()->_processQueuedSounds();
 				}
-#ifdef POCO_THREAD
+#	if OGGSOUND_THREADED == 1
 				Poco::Thread::sleep(10);
-#else
-				//boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+#	elif OGGSOUND_THREADED == 2
+				boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+#	elif OGGSOUND_THREADED == 3
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-#endif
+#	endif
 			}
 		}
 #endif
