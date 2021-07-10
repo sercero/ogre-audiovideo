@@ -1,4 +1,20 @@
-cmake_minimum_required (VERSION 2.8)
+#-------------------------------------------------------------------
+# This file is part of the CMake build system for OGRE Audio-Video
+#  (Object-oriented Graphics Rendering Engine Audio-Video Plugin)
+# For the latest info, see http://www.ogre3d.org/
+#
+# The contents of this file are placed in the public domain. Feel
+# free to make use of it in any way you like.
+#-------------------------------------------------------------------
+
+######################################################################
+# OGRE AUDIO-VIDEO BUILD SYSTEM
+# Welcome to the CMake build system for OGRE AUDIO-VIDEO.
+# This is the main file where we prepare the general build environment
+# and provide build configuration options.
+######################################################################
+
+cmake_minimum_required(VERSION 3.0.0)
 project(OgreVideoAudio)
 
 find_package(OGRE REQUIRED OPTIONAL_COMPONENTS Bites CONFIG)
@@ -7,6 +23,15 @@ option(BUILD_DEMOS "Build demo (requires Ogre Bites and both Audio and Video)" O
 option(BUILD_VIDEOPLUGIN "Build the Theora Video plugin" ON)
 option(BUILD_AUDIOPLUGIN "Build the OggSound Audio plugin" ON)
 include(GenerateExportHeader)
+
+#####################################################################
+# Set up the basic build environment
+#####################################################################
+
+if (NOT CMAKE_BUILD_TYPE)
+  # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up differentiation between debug and release builds.
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif ()
 
 SET(CMAKE_DEBUG_POSTFIX "_d")
 if(OGRE_PREFIX_DIR)
